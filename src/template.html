@@ -1,0 +1,577 @@
+<title>Endophthalmitis Risk</title>
+<meta name="description" content="Endophthalmitis after intravitreal injection and after cataract surgery: pooled risk per procedure and the factors that change it, with 95% confidence intervals and a numbered source for every figure.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column. Procedure switch, then per procedure: risk tiles, series chart, injection calculator, factor overview, factor forest plots. Brand: Leo Sheck tokens. */
+:root{
+  --bg:#F2F2F2; --surface:#FFFFFF; --surface-2:#F7F7F7; --ink:#030F26; --muted:#565E6E; --line:#E4E4E4; --grid:#EDEDED;
+  --accent:#030F26; --accent-soft:#E4E4E4; --accent-ink:#FFFFFF;
+  --good:#2F6B52; --warn:#94681C; --bad:#9C3A33;
+  --p1:#8C94A4; --p2:#4F5B75; --p3:#030F26; --band:rgba(3,15,38,.10);
+  --shadow:0 1px 2px rgba(3,15,38,.05),0 6px 20px rgba(3,15,38,.06);
+  --f-body:"Inter","Helvetica Neue",Arial,system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --r:2px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#030F26; --surface:#0A172E; --surface-2:#0E1C36; --ink:#F2F2F2; --muted:#A0A8B8; --line:#1E2B45; --grid:#14223B;
+  --accent:#E4E4E4; --accent-soft:#1A2843; --accent-ink:#030F26;
+  --good:#6FBE98; --warn:#D9A65A; --bad:#E58A80;
+  --p1:#56627C; --p2:#8F9BB4; --p3:#E4E4E4; --band:rgba(228,228,228,.13);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#030F26; --surface:#0A172E; --surface-2:#0E1C36; --ink:#F2F2F2; --muted:#A0A8B8; --line:#1E2B45; --grid:#14223B;
+  --accent:#E4E4E4; --accent-soft:#1A2843; --accent-ink:#030F26;
+  --good:#6FBE98; --warn:#D9A65A; --bad:#E58A80;
+  --p1:#56627C; --p2:#8F9BB4; --p3:#E4E4E4; --band:rgba(228,228,228,.13);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.3); color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:400 15px/1.55 var(--f-body);-webkit-font-smoothing:antialiased;margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:22px 48px;display:flex;flex-direction:column;gap:28px}
+@media (max-width:520px){.wrap{padding-inline:16px}}
+.brandbar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px 16px;padding-bottom:14px;border-bottom:1px solid var(--line)}
+.brandbar a{color:var(--ink);display:block;line-height:0}
+.brandbar svg{height:13px;width:auto;display:block}
+.brandbar span{font:500 .66rem/1.2 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+h1{font:300 1.6rem/1.25 var(--f-body);letter-spacing:.14em;text-transform:uppercase;margin:0;text-wrap:balance}
+h2{font:300 1.05rem/1.3 var(--f-body);letter-spacing:.16em;text-transform:uppercase;margin:0;text-wrap:balance}
+h3{font:600 .95rem/1.35 var(--f-body);margin:0}
+p{margin:0}
+.lede{color:var(--muted);margin-top:10px;max-width:75ch}
+.eyebrow{font:500 .68rem/1.2 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+a{color:inherit;text-underline-offset:2px}
+a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.sect{display:flex;flex-direction:column;gap:14px}
+.sect-hd{display:flex;flex-direction:column;gap:6px}
+.sect-hd p{color:var(--muted);font-size:.9rem;max-width:80ch}
+
+/* Procedure switch */
+.switch{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;flex-wrap:wrap}
+.seg button{font:500 .8rem/1 var(--f-body);letter-spacing:.04em;background:var(--surface);color:var(--muted);border:0;border-right:1px solid var(--line);padding:10px 14px;cursor:pointer}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.seg.small button{font-size:.74rem;padding:7px 10px}
+
+/* Tiles */
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.tile{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile .k{font:500 .66rem/1.3 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.tile .v{font:300 1.7rem/1.1 var(--f-body);font-variant-numeric:tabular-nums;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 6px}
+.tile .v small{font-size:.9rem;color:var(--muted)}
+.tile .ci{font:400 .8rem/1.4 var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* Panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.controls{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center}
+.ctl-label{font:500 .66rem/1 var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-right:8px}
+.chartbox{position:relative;overflow-x:auto}
+.chartbox.tall{max-height:640px;overflow-y:auto;border:1px solid var(--line)}
+svg.chart{display:block;width:100%;height:auto}
+svg.chart text{font-family:var(--f-body);fill:var(--ink)}
+.t-mut{fill:var(--muted)!important}
+.t-mono{font-family:var(--f-mono)!important;font-variant-numeric:tabular-nums}
+.tick{fill:var(--muted)!important;font-size:10.5px;font-family:var(--f-mono)!important}
+.row-hit{fill:transparent}
+.row:hover .row-hit,.row:focus .row-hit{fill:var(--accent-soft)}
+.row{cursor:default;outline:none}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font:400 .78rem/1.45 var(--f-body);padding:8px 10px;border-radius:var(--r);max-width:340px;z-index:3;box-shadow:var(--shadow)}
+.tip b{font-weight:600}
+.note{font-size:.86rem;color:var(--muted);max-width:90ch}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.8rem;color:var(--muted);align-items:center}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 .78rem/1.2 var(--f-body);background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:var(--r);padding:8px 11px;cursor:pointer;text-align:left}
+.chip[aria-pressed="true"]{border-color:var(--ink);background:var(--accent);color:var(--accent-ink)}
+.factor-hd{display:flex;flex-direction:column;gap:4px}
+.factor-hd .cmp{font:400 .82rem/1.4 var(--f-mono);color:var(--muted)}
+
+/* Calculator */
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:18px}
+@media (max-width:760px){.calc{grid-template-columns:1fr}}
+.calc .read{display:flex;flex-direction:column;gap:10px}
+.calc .big{font:300 2.2rem/1.1 var(--f-body);font-variant-numeric:tabular-nums}
+.calc label{font-size:.85rem;color:var(--muted);display:flex;flex-direction:column;gap:6px}
+.calc input[type=range]{width:100%;accent-color:var(--ink)}
+.calc>*{min-width:0}
+.calc select{width:100%;max-width:100%;font:inherit;font-size:.85rem;padding:7px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);color:var(--ink)}
+
+/* Tables */
+.tablewrap{overflow-x:auto;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:.82rem;min-width:560px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font:500 .66rem/1.3 var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--surface-2)}
+td.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* Methods, references */
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.cols p,.cols li{font-size:.88rem;color:var(--muted)}
+.cols ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+ol.refs{margin:0;padding-left:0;list-style:none;columns:2;column-gap:28px;font-size:.8rem;color:var(--muted)}
+ol.refs li{break-inside:avoid;margin-bottom:6px;display:grid;grid-template-columns:2.6em 1fr;gap:4px}
+ol.refs .n{font-family:var(--f-mono);color:var(--ink)}
+ol.refs li:target{background:var(--accent-soft)}
+.lib{font:500 .62rem/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);padding:2px 4px;margin-left:4px;white-space:nowrap}
+sup.r{font:500 .68em/1 var(--f-mono)}
+sup.r a{text-decoration:none}
+footer{font-size:.78rem;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:820px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.tiles{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.methods-stack{display:flex;flex-direction:column;gap:18px}
+.methods-stack ul{max-width:none}
+@media (max-width:700px){ol.refs{columns:1}}
+.tile[role=button]{cursor:pointer}
+.tile[role=button]:hover{background:var(--accent-soft)}
+.tile[role=button]:focus-visible{outline:2px solid var(--ink);outline-offset:-4px}
+.ftitle{margin:6px 0 2px;font-size:1rem;font-weight:600;color:var(--ink)}
+.series-head{position:sticky;top:0;z-index:2;background:var(--surface);min-width:760px}
+.series-head svg{width:100%}
+</style>
+
+<div class="wrap">
+  /*BRANDBAR*/
+
+  <header>
+    <div class="eyebrow">Infection risk · injections and cataract surgery</div>
+    <h1 style="margin-top:8px">Endophthalmitis Risk</h1>
+    <p class="lede">How often endophthalmitis follows an intravitreal injection or a cataract operation, pooled from published series, and how much each preventive measure or risk factor changes it. Every interval is a 95% confidence interval. Numbers in brackets point to the numbered sources at the foot of the page.</p>
+  </header>
+
+  <div class="switch" role="group" aria-label="Procedure">
+    <span class="ctl-label">Procedure</span>
+    <div class="seg" id="procSeg">
+      <button type="button" data-proc="ivi" aria-pressed="true">Intravitreal injection</button>
+      <button type="button" data-proc="cat" aria-pressed="false">Cataract surgery</button>
+    </div>
+  </div>
+
+  <!-- ============ INJECTIONS ============ -->
+  <section id="ivi" class="sect" data-proc-sec="ivi" style="gap:28px">
+    <div class="sect">
+      <div class="sect-hd"><h2>Risk per injection</h2>
+        <p>Random-effects pool of every primary series with at least 10,000 injections and a reported case count. Select a box to show its series in the chart below, or for the syringe arms, the comparative studies. Overlapping reports from the same centre or database were reduced to one (list under Methods).</p></div>
+      <div class="tiles" id="iviTiles"></div>
+    </div>
+
+    <div class="panel">
+      <div class="factor-hd"><h3>Each series, rate per 10,000 injections</h3>
+        <p class="note">Dot is the observed rate, line its exact 95% interval. The years beside each country are the years in which the injections were given. Diamonds are pooled estimates. Hover or focus a row for details.</p></div>
+      <div class="controls">
+        <div><span class="ctl-label">Show</span><div class="seg small" id="iviGrp"></div></div>
+        <div><span class="ctl-label">Order</span><div class="seg small" id="iviSort">
+          <button type="button" data-s="n" aria-pressed="true">Size</button><button type="button" data-s="rate" aria-pressed="false">Rate</button><button type="button" data-s="year" aria-pressed="false">Study years</button></div></div>
+      </div>
+      <div class="chartbox tall" id="iviSeriesBox"></div>
+      <p class="note" id="iviMetaNote"></p>
+    </div>
+
+    <div class="panel">
+      <div class="factor-hd"><h3>Risk per eye over a course of injections</h3>
+        <p class="note">Cumulative probability of at least one infection, 1 − (1 − p)<sup>n</sup>, assuming the same independent risk p at every injection. Open circles are cumulative risks observed in two large cohorts.</p></div>
+      <div class="calc">
+        <div class="read">
+          <label for="cumN">Number of injections in the eye <b id="cumNval" style="color:var(--ink)"></b><input type="range" id="cumN" min="1" max="150" value="24"></label>
+          <label for="cumBasis">Hypothetical per-injection risk
+            <select id="cumBasis">
+              <option value="all">All series pooled</option>
+              <option value="pfs">Prefilled-syringe arms of comparative studies</option>
+              <option value="vial">Vial-drawn arms of the same studies</option>
+            </select></label>
+          <div><div class="eyebrow">Cumulative risk</div><div class="big" id="cumOut"></div><div class="ci t-mono" id="cumCi" style="font-family:var(--f-mono);font-size:.82rem;color:var(--muted)"></div></div>
+        </div>
+        <div class="chartbox" id="cumBox"></div>
+      </div>
+      <p class="note" id="cumNote" style="max-width:none"></p>
+    </div>
+
+    <div class="sect">
+      <div class="sect-hd"><h2>Factors that change the risk</h2>
+        <p>Ratios above 1 mean more infections with the named factor; below 1, fewer. Squares are single studies (counts as infections over injections), hollow diamonds are published meta-analyses, and the filled diamond is a random-effects pool of the single studies calculated for this page. Relative risk here means the risk ratio calculated from counts or, where a paper gave only an adjusted estimate, its published odds ratio or incidence rate ratio (the measure is named when a row is hovered). For an outcome this rare these measures are numerically almost identical. No included study reported a hazard ratio. The axis is logarithmic so that halving and doubling sit the same distance from 1.</p></div>
+      <div class="panel">
+        <div class="factor-hd"><h3>All injection factors on one scale</h3>
+          <p class="note">One line per factor: the pool calculated here where one exists, otherwise the most recent meta-analysis, otherwise the largest single study. Each ratio compares the first-named condition with the second, so below 1 means fewer infections with the first. Select a row to open its studies below.</p></div>
+        <div class="chartbox" id="iviOverview"></div>
+      </div>
+      <div class="panel">
+        <div class="factor-hd"><h3>Injection factors, study by study</h3>
+          <p class="note">Choose a factor to see each study, the pool of single studies where one is possible, and published meta-analyses.</p></div>
+        <div class="chips" id="iviFactors" role="group" aria-label="Injection factors"></div>
+        <div class="factor-hd"><h4 id="iviFTitle" class="ftitle"></h4><div class="cmp" id="iviFCmp"></div></div>
+        <div class="chartbox" id="iviForest"></div>
+        <p class="note" id="iviFNote"></p>
+        <div id="iviExtra"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CATARACT ============ -->
+  <section id="cat" class="sect" data-proc-sec="cat" style="gap:28px" hidden>
+    <div class="sect">
+      <div class="sect-hd"><h2>Risk per operation</h2>
+        <p>Random-effects pools of every series with at least 10,000 operations and a reported case count, grouped by whether intracameral antibiotic was routine during the study period. Overlapping national register reports were reduced to one per period (list under Methods). Select a box to show its series in the chart below, or for the comparative-study arms, the studies themselves.</p></div>
+      <div class="tiles" id="catTiles"></div>
+    </div>
+
+    <div class="panel">
+      <div class="factor-hd"><h3>Each series, rate per 10,000 operations</h3>
+        <p class="note">Dot is the observed rate, line its exact 95% interval. The years beside each country are the years in which the operations were done. Shade marks intracameral antibiotic use during the series. Diamonds are pooled estimates.</p></div>
+      <div class="controls">
+        <div><span class="ctl-label">Show</span><div class="seg small" id="catGrp"></div></div>
+        <div><span class="ctl-label">Order</span><div class="seg small" id="catSort">
+          <button type="button" data-s="n" aria-pressed="true">Size</button><button type="button" data-s="rate" aria-pressed="false">Rate</button><button type="button" data-s="year" aria-pressed="false">Study years</button></div></div>
+      </div>
+      <div class="legend" id="catLegend"></div>
+      <div class="chartbox tall" id="catSeriesBox"></div>
+      <p class="note" id="catMetaNote"></p>
+    </div>
+
+    <div class="sect">
+      <div class="sect-hd"><h2>Factors that change the risk</h2>
+        <p>Ratios above 1 mean more infections with the named factor; below 1, fewer. Squares are single studies (counts as infections over operations), hollow diamonds are published meta-analyses, and filled diamonds are random-effects pools calculated for this page. Relative risk here means the risk ratio calculated from counts or, where a paper gave only an adjusted estimate, its published odds ratio or incidence rate ratio (the measure is named when a row is hovered). For an outcome this rare these measures are numerically almost identical. No included study reported a hazard ratio. The axis is logarithmic so that halving and doubling sit the same distance from 1.</p></div>
+      <div class="panel">
+        <div class="factor-hd"><h3>All cataract factors on one scale</h3>
+          <p class="note">One line per factor: the pool calculated here where one exists, otherwise the most recent meta-analysis, otherwise the largest single study. Each ratio compares the first-named condition with the second, so below 1 means fewer infections with the first. Select a row to open its studies below.</p></div>
+        <div class="chartbox" id="catOverview"></div>
+      </div>
+      <div class="panel">
+        <div class="factor-hd"><h3>Cataract factors, study by study</h3>
+          <p class="note">Choose a factor to see each study, the pool of single studies where one is possible, and published meta-analyses.</p></div>
+        <div class="chips" id="catFactors" role="group" aria-label="Cataract factors"></div>
+        <div class="factor-hd"><h4 id="catFTitle" class="ftitle"></h4><div class="cmp" id="catFCmp"></div></div>
+        <div class="chartbox" id="catForest"></div>
+        <p class="note" id="catFNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ METHODS ============ -->
+  <section class="sect" id="methods">
+    <div class="sect-hd"><h2>Search and methods</h2></div>
+    <div class="methods-stack">
+      <div>
+        <h3 style="margin-bottom:6px">Sources searched, in order</h3>
+        <ul>
+          <li>Bear's journal reading wiki (endophthalmitis page, about 41 sources, and the cataract, anti-VEGF and steroid pages), then the Zotero library (66 items mentioning endophthalmitis, plus a full-text search of the stored PDFs). Items held there are marked <span class="lib">Library</span> in the list of sources.</li>
+          <li>PubMed, searched on 8 October 2026: /*QCOUNT*/ queries plus related-article searches from key papers. /*META*/ abstracts were screened and PubMed Central full text was opened where an abstract lacked counts. The full query list and exclusions are in the search log kept with the page source.</li>
+          <li>Not found or not available: the full ESCRS 2007 paper (abstract and the 2006 interim counts used), the NZ national audit of injection or cataract endophthalmitis, and any study of needle gauge or lid speculum with counts.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom:6px">Calculations</h3>
+        <ul>
+          <li>Rate intervals are exact (Clopper-Pearson) binomial intervals from the reported counts.</li>
+          <li>Pooled rates: DerSimonian-Laird random effects on the logit scale, 0.5 added to zero counts. The prediction interval shows where a new centre's rate is expected to fall.</li>
+          <li>Ratios from counts: risk ratio with a log-normal interval, 0.5 added to every cell when a cell is zero. Reported odds ratios, incidence rate ratios and adjusted estimates are shown as published (inverted where the paper used the opposite reference). For an event this rare, odds and risk ratios are numerically almost identical.</li>
+          <li>Pooled ratios combine single-study rows only (never meta-analyses), with DerSimonian-Laird weights; I² is given with each pool. Rows marked "not pooled" share a reference group with another row.</li>
+          <li>Counts marked "derived" were back-calculated from a reported rate and denominator.</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="margin-bottom:6px">Read with care</h3>
+        <ul>
+          <li>Case definitions differ: some series count only culture-proven or tapped-and-injected cases, others count any diagnosis code, which includes sterile inflammation. This alone can explain a several-fold spread between centres.</li>
+          <li>Almost all comparisons are observational, and many are before-and-after changes in one unit, where other practices changed at the same time.</li>
+          <li>Excluded from the injection pool as overlapping: <span id="exclList"></span>.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="sect" id="sources">
+    <div class="sect-hd"><h2>Sources</h2><p>Numbered in order of first citation down the page (injection section first). Links open PubMed or the DOI.</p></div>
+    <ol class="refs" id="refList"></ol>
+  </section>
+
+  <footer>Compiled for Leo Sheck, Retina Specialists, Auckland. Literature to 8 October 2026.</footer>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const DATA=/*DATA*/;
+const $=s=>document.querySelector(s);
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs={},parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function txt(parent,x,y,s,attrs={}){const t=el('text',Object.assign({x,y},attrs),parent);t.textContent=s;return t}
+function sig(v,d=2){if(v===0)return'0';const m=Math.pow(10,d-1-Math.floor(Math.log10(Math.abs(v))));return String(Math.round(v*m)/m)}
+function pct(p){return sig(p*100,2)+'%'}
+function per10k(p){return sig(p*1e4,2)}
+function oneIn(p){if(!p)return'';const n=1/p;const r=n>=1000?Math.round(n/100)*100:n>=100?Math.round(n/10)*10:Math.round(n);return'about 1 in '+r.toLocaleString('en-NZ')}
+function fr(v){return v>=10?v.toFixed(1):v>=1?v.toFixed(2):v.toFixed(2)}
+const REFS={};DATA.refs.forEach(r=>REFS[r.n]=r);
+function authYear(n){const r=REFS[n];if(!r)return'';const a=r.cite.split(/[ ,.]/)[0];const ys=r.cite.match(/(19|20)\d{2}/g);return a+(ys?' '+ys[ys.length-1]:'')}
+function refShort(n){const r=REFS[n];if(!r)return'';return r.cite.split('.')[0]}
+const tip=$('#tip');
+function showTip(evt,html,box){tip.innerHTML=html;tip.hidden=false;const b=box.getBoundingClientRect();const w=document.querySelector('.wrap').getBoundingClientRect();
+  let x=(evt.clientX||b.left+40)+14+window.scrollX, y=(evt.clientY||b.top+40)+14+window.scrollY;
+  const tw=tip.offsetWidth; if(x+tw>window.scrollX+document.documentElement.clientWidth-8)x=window.scrollX+document.documentElement.clientWidth-tw-8;
+  tip.style.left=x+'px';tip.style.top=y+'px'}
+function hideTip(){tip.hidden=true}
+function bindTip(g,html,box){g.setAttribute('tabindex','0');g.addEventListener('mousemove',e=>showTip(e,html(),box));g.addEventListener('mouseleave',hideTip);
+  g.addEventListener('focus',()=>{const r=g.getBoundingClientRect();showTip({clientX:r.left+r.width*.4,clientY:r.top+r.height},html(),box)});g.addEventListener('blur',hideTip)}
+
+/* log axis helper */
+function logScale(d0,d1,r0,r1){const a=Math.log10(d0),b=Math.log10(d1);const f=v=>r0+(Math.log10(Math.min(Math.max(v,d0),d1))-a)/(b-a)*(r1-r0);f.d0=d0;f.d1=d1;return f}
+function ticksFor(d0,d1){const all=[0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10,20,50,100,200,500,1000];return all.filter(t=>t>=d0*0.999&&t<=d1*1.001)}
+function niceDomain(lo,hi,minLo,maxHi){const steps=[0.01,0.02,0.05,0.1,0.2,0.5,1,2,5,10,20,50,100,200,500,1000];
+  let a=steps.filter(s=>s<=Math.max(lo,minLo)).pop()||steps[0];let b=steps.find(s=>s>=Math.min(hi,maxHi))||steps[steps.length-1];return[a,b]}
+
+/* ---------- tiles ---------- */
+function tile(k,p,lo,hi,extra,lead){return `<div class="tile${lead?' lead':''}"><div class="k">${k}</div><div class="v">${pct(p)}<small>${oneIn(p)}</small></div><div class="ci">95% CI ${pct(lo)} to ${pct(hi)}${extra?'<br>'+extra:''}</div></div>`}
+function renderTiles(){
+  const I=DATA.ivi,P=I.pooled,G=I.pooled_groups;
+  let h=tile('All series pooled',P.est,P.lo,P.hi,`${P.k} series, ${P.cases.toLocaleString()} cases in ${(P.n/1e6).toFixed(1)} million injections · I² ${P.i2}%<br>Prediction interval ${pct(P.pilo)} to ${pct(P.pihi)}`,true);
+  for(const g in G){const v=G[g];h+=tile(g,v.est,v.lo,v.hi,`${v.k} series, ${v.cases.toLocaleString()} cases`)}
+  h+=tile('Prefilled-syringe arms',I.pfs_rate.est,I.pfs_rate.lo,I.pfs_rate.hi,`${I.pfs_rate.k} comparisons, ${I.pfs_rate.cases} cases`);
+  h+=tile('Vial-drawn arms',I.vial_rate.est,I.vial_rate.lo,I.vial_rate.hi,`same ${I.vial_rate.k} comparisons, ${I.vial_rate.cases} cases`);
+  $('#iviTiles').innerHTML=h;
+  const C=DATA.cat,Q=C.pooled_groups;
+  let c=tile('Routine intracameral antibiotic',Q['Routine intracameral'].est,Q['Routine intracameral'].lo,Q['Routine intracameral'].hi,`${Q['Routine intracameral'].k} series, ${Q['Routine intracameral'].cases.toLocaleString()} cases<br>Prediction interval ${pct(Q['Routine intracameral'].pilo)} to ${pct(Q['Routine intracameral'].pihi)}`,true);
+  c+=tile('No routine intracameral antibiotic',Q['No routine intracameral'].est,Q['No routine intracameral'].lo,Q['No routine intracameral'].hi,`${Q['No routine intracameral'].k} series, ${Q['No routine intracameral'].cases.toLocaleString()} cases`);
+  c+=tile('Mixed or not recorded',Q['Mixed or not recorded'].est,Q['Mixed or not recorded'].lo,Q['Mixed or not recorded'].hi,`${Q['Mixed or not recorded'].k} series`);
+  c+=tile('Series starting 2010 or later',C.pooled_recent.est,C.pooled_recent.lo,C.pooled_recent.hi,`${C.pooled_recent.k} series, any prophylaxis`);
+  c+=tile('Intracameral arms of comparative studies',C.ic_arm.est,C.ic_arm.lo,C.ic_arm.hi,`${C.ic_arm.k} comparisons, ${C.ic_arm.cases} cases; no-intracameral arms ${pct(C.noic_arm.est)} (${pct(C.noic_arm.lo)} to ${pct(C.noic_arm.hi)})`);
+  c+=tile('All series pooled',C.pooled.est,C.pooled.lo,C.pooled.hi,`${C.pooled.k} series, ${(C.pooled.n/1e6).toFixed(1)} million operations · I² ${C.pooled.i2}%`);
+  $('#catTiles').innerHTML=c;
+  $('#iviMetaNote').innerHTML='Published pooled estimates for comparison: '+I.metas.map(m=>`${m.label} ${pct(m.rate)} (${pct(m.lo)} to ${pct(m.hi)}) <sup class="r"><a href="#ref${m.ref}">[${m.ref}]</a></sup>`).join('; ')+'.';
+  $('#catMetaNote').innerHTML='Published pooled estimates for comparison: '+C.metas.map(m=>`${m.label} ${pct(m.rate)}${m.lo?` (${pct(m.lo)} to ${pct(m.hi)})`:''} <sup class="r"><a href="#ref${m.ref}">[${m.ref}]</a></sup>`).join('; ')+'. US Medicare 2011-2019 reported 1.36 per 1,000 (no case count in the abstract) <sup class="r"><a href="#ref'+DATA.refs.find(r=>r.key==='Zafar2021Medicare').n+'">['+DATA.refs.find(r=>r.key==='Zafar2021Medicare').n+']</a></sup>.';
+}
+
+/* ---------- series chart ---------- */
+const GROUPSHADE={'Routine intracameral':'var(--p3)','No routine intracameral':'var(--p1)','Mixed or not recorded':'var(--p2)',
+  'National, claims or registry':'var(--p3)','Multi-centre':'var(--p2)','Single centre':'var(--p2)'};
+function startYear(s){const m=(s.period||'').match(/(\d{4})/);return m?+m[1]:9999}
+function renderSeries(boxSel,series,pooledAll,pooledGroups,grpField,state,unit){
+  const box=$(boxSel);box.innerHTML='';
+  let rows=series.filter(s=>state.grp==='all'||(state.grp==='recent'?startYear(s)>=2010&&startYear(s)<9999:s[grpField]===state.grp));
+  rows=rows.slice().sort(state.sort==='n'?(a,b)=>b.n-a.n:state.sort==='rate'?(a,b)=>b.rate-a.rate:(a,b)=>startYear(a)-startYear(b));
+  const pooledRows=[{label:'All series, pooled',p:pooledAll,main:true}];
+  for(const g in pooledGroups){if(state.grp==='all'||state.grp===g)pooledRows.push({label:g+', pooled',p:pooledGroups[g]})}
+  if(state.grp==='recent')pooledRows.push({label:'Starting 2010 or later, pooled',p:DATA.cat.pooled_recent});
+  const W=980,RH=17,top=46,L=300,R=740;
+  const HH=top+pooledRows.length*RH+8,HB=rows.length*RH+16;
+  let lo=Infinity,hi=0;series.forEach(r=>{if(r.lo>0)lo=Math.min(lo,r.lo*1e4);hi=Math.max(hi,r.hi*1e4)});
+  const [d0,d1]=niceDomain(lo,hi,0.05,200);
+  const x=logScale(d0,d1,L,R);
+  let svg=el('svg',{class:'chart',viewBox:`0 0 ${W} ${HH}`,role:'img','aria-label':`Pooled rate per 10,000 ${unit} with 95% confidence intervals`});
+  svg.style.minWidth='760px';svg.style.display='block';
+  const svgB=el('svg',{class:'chart',viewBox:`0 0 ${W} ${HB}`,role:'img','aria-label':`Rate per 10,000 ${unit} for each series with 95% confidence intervals`});
+  svgB.style.minWidth='760px';svgB.style.display='block';
+  ticksFor(d0,d1).forEach(t=>{el('line',{x1:x(t),x2:x(t),y1:top-6,y2:HH,stroke:'var(--grid)','stroke-width':1},svg);el('line',{x1:x(t),x2:x(t),y1:0,y2:HB-8,stroke:'var(--grid)','stroke-width':1},svgB);txt(svg,x(t),top-12,String(t),{class:'tick','text-anchor':'middle'})});
+  txt(svg,(L+R)/2,13,`Rate per 10,000 ${unit} (log scale)`,{class:'t-mut','text-anchor':'middle','font-size':11});
+  txt(svg,4,top-12,'Series',{class:'t-mut','font-size':10.5});
+  txt(svg,R+14,top-12,'Cases / '+unit,{class:'t-mut','font-size':10.5});
+  txt(svg,W-4,top-12,'Rate (95% CI)',{class:'t-mut','font-size':10.5,'text-anchor':'end'});
+  let y=top;
+  pooledRows.forEach(pr=>{const p=pr.p,g=el('g',{class:'row'},svg);
+    el('rect',{class:'row-hit',x:0,y:y,width:W,height:RH},g);
+    const cy=y+RH/2,a=x(p.lo*1e4),b=x(p.hi*1e4),m=x(p.est*1e4);
+    if(p.pilo)el('line',{x1:x(p.pilo*1e4),x2:x(p.pihi*1e4),y1:cy,y2:cy,stroke:'var(--p1)','stroke-width':1,'stroke-dasharray':'2 2'},g);
+    el('polygon',{points:`${a},${cy} ${m},${cy-5} ${b},${cy} ${m},${cy+5}`,fill:pr.main?'var(--ink)':'var(--p2)'},g);
+    txt(g,4,cy+4,pr.label,{'font-size':11.5,'font-weight':pr.main?600:500});
+    txt(g,R+14,cy+4,`${p.cases.toLocaleString()} / ${p.n.toLocaleString()}`,{class:'t-mono t-mut','font-size':10.5});
+    txt(g,W-4,cy+4,`${per10k(p.est)} (${per10k(p.lo)}–${per10k(p.hi)})`,{class:'t-mono','font-size':10.5,'text-anchor':'end'});
+    bindTip(g,()=>`<b>${pr.label}</b><br>Random-effects pool of ${p.k} series: ${pct(p.est)} (${pct(p.lo)} to ${pct(p.hi)}), ${oneIn(p.est)}.${p.pilo?`<br>Prediction interval ${pct(p.pilo)} to ${pct(p.pihi)} (dashed).`:''}<br>I² ${p.i2}%.`,box);
+    y+=RH});
+  el('line',{x1:0,x2:W,y1:HH-1,y2:HH-1,stroke:'var(--line)'},svg);y=4;
+  rows.forEach(s=>{const g=el('g',{class:'row'},svgB);el('rect',{class:'row-hit',x:0,y:y,width:W,height:RH},g);
+    const cy=y+RH/2,shade=GROUPSHADE[s[grpField]]||'var(--p2)';
+    const a=x(Math.max(s.lo*1e4,d0)),b=x(s.hi*1e4);
+    el('line',{x1:a,x2:b,y1:cy,y2:cy,stroke:shade,'stroke-width':1.6},g);
+    if(s.lo*1e4<d0)el('polygon',{points:`${L-1},${cy} ${L+5},${cy-3} ${L+5},${cy+3}`,fill:shade},g);
+    if(s.cases>0)el('circle',{cx:x(s.rate*1e4),cy,r:4,fill:shade,stroke:'var(--surface)','stroke-width':1.5},g);
+    else el('circle',{cx:L+2,cy,r:3.5,fill:'var(--surface)',stroke:shade,'stroke-width':1.5},g);
+    const lab=(s.label||'');
+    txt(g,4,cy+4,lab.length>23?lab.slice(0,22)+'…':lab,{'font-size':11});
+    const ctry=((s.country||'').replace(/\s*\(.*?\)/g,'')+' '+(s.period&&s.period!=='not stated'?s.period:'')).trim();
+    txt(g,150,cy+4,ctry.length>21?ctry.slice(0,20)+'…':ctry,{class:'t-mut','font-size':10});
+    const sr=el('text',{x:L-8,y:cy+4,'text-anchor':'end','font-size':9.5,class:'t-mut t-mono'},g);sr.textContent='['+s.ref+']';
+    txt(g,R+14,cy+4,`${s.cases.toLocaleString()} / ${s.n.toLocaleString()}`,{class:'t-mono t-mut','font-size':10.5});
+    txt(g,W-4,cy+4,`${per10k(s.rate)} (${per10k(s.lo)}–${per10k(s.hi)})`,{class:'t-mono','font-size':10.5,'text-anchor':'end'});
+    bindTip(g,()=>`<b>${REFS[s.ref].cite}</b><br>${s.design||''}${s.country?' · '+s.country:''}${s.period?' · '+s.period:''}<br>${s.cases.toLocaleString()} cases in ${s.n.toLocaleString()} ${unit}: ${pct(s.rate)} (${pct(s.lo)} to ${pct(s.hi)})${s.cases?', '+oneIn(s.rate):''}${s[grpField]?'<br>'+s[grpField]:''}${s.note?'<br>'+s.note:''}`,box);
+    y+=RH});
+  const head=document.createElement('div');head.className='series-head';head.appendChild(svg);box.appendChild(head);box.appendChild(svgB);
+}
+function segInit(sel,options,state,key,onchange){const c=$(sel);if(options){c.innerHTML=options.map(o=>`<button type="button" data-v="${o.v}" aria-pressed="${o.v===state[key]}">${o.l}</button>`).join('')}
+  c.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{c.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');state[key]=b.dataset.v||b.dataset.s;onchange()}))}
+
+/* ---------- forest ---------- */
+function rowDomain(rows,extra=[]){let lo=Infinity,hi=0;rows.concat(extra).forEach(r=>{if(r&&r.lo>0){lo=Math.min(lo,r.lo);hi=Math.max(hi,r.hi)}});return niceDomain(Math.min(lo,0.9),Math.max(hi,1.1),0.01,1000)}
+function renderForest(boxSel,f,unit,noteRef){
+  const box=$(boxSel);box.innerHTML='';
+  const rows=f.rows.slice();
+  // group headers
+  const order=[];const groups=[...new Set(rows.filter(r=>r.kind==='study').map(r=>r.group||''))];
+  groups.forEach(g=>{if(g&&groups.length>1)order.push({hdr:g});rows.filter(r=>r.kind==='study'&&(r.group||'')===g).forEach(r=>order.push(r));
+    const sp=(f.subpools||[]).find(s=>s.group===g);if(sp)order.push({isSub:true,label:'Pool, '+g.toLowerCase(),...sp})});
+  if(f.pooled)order.push({isPool:true,label:'Pooled single studies',...f.pooled});
+  const metas=rows.filter(r=>r.kind==='meta');if(metas.length){order.push({hdr:'Published meta-analyses'});metas.forEach(r=>order.push(r))}
+  const W=980,RH=19,top=40,L=330,R=690;
+  const H=top+order.length*RH+34;
+  const [d0,d1]=rowDomain(rows,[f.pooled]);
+  const x=logScale(d0,d1,L,R);
+  const svg=el('svg',{class:'chart',viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':`Forest plot: ${f.title}`});svg.style.minWidth='760px';
+  ticksFor(d0,d1).forEach(t=>{el('line',{x1:x(t),x2:x(t),y1:top-6,y2:H-30,stroke:t===1?'var(--p2)':'var(--grid)','stroke-width':t===1?1.2:1},svg);txt(svg,x(t),H-16,String(t),{class:'tick','text-anchor':'middle'})});
+  const sh=SHORT[f.id]||['the named factor',null];
+  txt(svg,x(1)-6,H-3,'◀ fewer infections with '+sh[0],{class:'t-mut','font-size':10,'text-anchor':'end'});
+  txt(svg,x(1)+6,H-3,sh[1]?'fewer infections with '+sh[1]+' ▶':'more infections with '+sh[0]+' ▶',{class:'t-mut','font-size':10});
+  txt(svg,4,top-16,'Study',{class:'t-mut','font-size':10.5});
+  txt(svg,R+14,top-16,'Exposed',{class:'t-mut','font-size':10.5});
+  txt(svg,R+112,top-16,'Reference',{class:'t-mut','font-size':10.5});
+  txt(svg,W-4,top-16,'Relative risk (95% CI)',{class:'t-mut','font-size':10.5,'text-anchor':'end'});
+  txt(svg,(L+R)/2,top-16,'Relative risk (log scale)',{class:'t-mut','font-size':10.5,'text-anchor':'middle'});
+  let y=top;
+  order.forEach(r=>{
+    const cy=y+RH/2;
+    if(r.hdr){txt(svg,4,cy+5,r.hdr.toUpperCase(),{class:'t-mut','font-size':9.5,'letter-spacing':'1.2'});y+=RH;return}
+    const g=el('g',{class:'row'},svg);el('rect',{class:'row-hit',x:0,y:y,width:W,height:RH},g);
+    const a=x(r.lo),b=x(r.hi),m=x(r.est);
+    if(r.isPool||r.isSub){
+      el('polygon',{points:`${a},${cy} ${m},${cy-6} ${b},${cy} ${m},${cy+6}`,fill:r.isPool?'var(--ink)':'var(--p2)'},g);
+      if(r.pilo)el('line',{x1:x(r.pilo),x2:x(r.pihi),y1:cy,y2:cy,stroke:'var(--p1)','stroke-dasharray':'2 2'},g);
+      txt(g,4,cy+4,r.label,{'font-size':11.5,'font-weight':r.isPool?600:500});
+      txt(g,R+14,cy+4,`${r.k} studies · I² ${r.i2}%`,{class:'t-mut','font-size':10.5});
+      txt(g,W-4,cy+4,`${fr(r.est)} (${fr(r.lo)}–${fr(r.hi)})`,{class:'t-mono','font-size':10.5,'text-anchor':'end','font-weight':r.isPool?600:400});
+      bindTip(g,()=>`<b>${r.label}</b><br>Random-effects pool calculated for this page from ${r.k} single-study rows: ${fr(r.est)} (${fr(r.lo)} to ${fr(r.hi)}), I² ${r.i2}%.${r.pilo?`<br>Prediction interval ${fr(r.pilo)} to ${fr(r.pihi)} (dashed).`:''}`,box);
+    }else{
+      const shade=r.kind==='meta'?'var(--p2)':'var(--ink)';
+      const ca=x(r.lo),cb=x(r.hi);
+      el('line',{x1:ca,x2:cb,y1:cy,y2:cy,stroke:shade,'stroke-width':1.5},g);
+      if(r.lo<d0)el('polygon',{points:`${L-2},${cy} ${L+4},${cy-3} ${L+4},${cy+3}`,fill:shade},g);
+      if(r.hi>d1)el('polygon',{points:`${R+2},${cy} ${R-4},${cy-3} ${R-4},${cy+3}`,fill:shade},g);
+      if(r.kind==='meta')el('polygon',{points:`${m-5},${cy} ${m},${cy-5} ${m+5},${cy} ${m},${cy+5}`,fill:'var(--surface)',stroke:shade,'stroke-width':1.5},g);
+      else el('rect',{x:m-4,y:cy-4,width:8,height:8,fill:r.pool===false?'var(--surface)':shade,stroke:shade,'stroke-width':1.5},g);
+      const lab=authYear(r.ref)+(r.label?', '+r.label:'');
+      txt(g,4,cy+4,lab.length>52?lab.slice(0,51)+'…':lab,{'font-size':11});
+      const sr=el('text',{x:L-8,y:cy+4,'text-anchor':'end','font-size':9.5,class:'t-mut t-mono'},g);sr.textContent='['+r.ref+']';
+      txt(g,R+14,cy+4,r.a||(r.kind==='meta'?'':'—'),{class:'t-mono t-mut','font-size':10});
+      txt(g,R+112,cy+4,r.b||'',{class:'t-mono t-mut','font-size':10});
+      txt(g,W-4,cy+4,`${fr(r.est)} (${fr(r.lo)}–${fr(r.hi)})`,{class:'t-mono','font-size':10.5,'text-anchor':'end'});
+      bindTip(g,()=>`<b>${REFS[r.ref].cite}</b><br>${r.label?r.label+'<br>':''}${r.measure}: ${fr(r.est)} (${fr(r.lo)} to ${fr(r.hi)})${r.a?`<br>Exposed ${r.a} (${pct(r.ra)}), reference ${r.b} (${pct(r.rb)})`:''}${r.derived?'<br>Counts derived from reported rates.':''}${r.pool===false&&r.kind==='study'?'<br>Not included in the pool.':''}${r.note?'<br>'+r.note:''}`,box);
+    }
+    y+=RH});
+  box.appendChild(svg);
+}
+function factorPick(f){if(f.pooled)return{est:f.pooled.est,lo:f.pooled.lo,hi:f.pooled.hi,src:`pool of ${f.pooled.k}`};
+  const metas=f.rows.filter(r=>r.kind==='meta');if(metas.length){const r=metas[metas.length-1];return{est:r.est,lo:r.lo,hi:r.hi,src:'meta-analysis ['+r.ref+']'}}
+  return null}
+const SHORT={pfs:['prefilled syringe','vial'],pfs_cp:['prefilled syringe','vial'],comp:['compounded syringe','vial'],steroid:['steroid'],afl:['aflibercept','bevacizumab or ranibizumab'],bev:['bevacizumab','ranibizumab'],abx:['topical antibiotic'],chx:['chlorhexidine','povidone-iodine'],nopi:['no or reduced iodine'],mask:['universal masks'],talk:['mask or no talking'],setting:['clinic room','theatre'],bilat:['bilateral session'],injector:['trainee injector'],
+  ic:['intracameral antibiotic'],icagent:['moxifloxacin','cefuroxime'],pcr:['capsule rupture'],pcric:['intracameral antibiotic'],incision:['clear corneal incision','scleral or limbal incision'],isbcs:['same-day bilateral surgery'],male:['male sex'],diabetes:['diabetes']};
+const NOPOOL={pfs_cp:'only one single study reports culture-positive cases by syringe type, and a pool needs at least two.',comp:'only one single study compares compounded syringes with vials, and a pool needs at least two.',
+  talk:'each study answers a different question (injector mask against no mask, mask against a no-talking policy, no-talking against usual care), so they cannot be combined.',
+  patient:'each row is a different patient factor.',anaes:'each row is a different technique comparison.',other:'each row is a different factor.',
+  topical:'each row is a different comparison (drops against placebo, drops added to intracameral antibiotic, one fluoroquinolone against another, no antibiotic against drops).'};
+function renderOverview(boxSel,factors,onPick){
+  const box=$(boxSel);box.innerHTML='';
+  const items=factors.filter(f=>!['other','patient','anaes'].includes(f.id)).map(f=>({f,p:factorPick(f)})).filter(i=>i.p);
+  const W=980,RH=22,top=30,L=430,R=820,H=top+items.length*RH+34;
+  const [d0,d1]=niceDomain(Math.min(...items.map(i=>i.p.lo),0.9),Math.max(...items.map(i=>i.p.hi),1.1),0.01,1000);
+  const x=logScale(d0,d1,L,R);
+  const svg=el('svg',{class:'chart',viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'Summary of factor estimates'});svg.style.minWidth='700px';
+  ticksFor(d0,d1).forEach(t=>{el('line',{x1:x(t),x2:x(t),y1:top-4,y2:H-30,stroke:t===1?'var(--p2)':'var(--grid)'},svg);txt(svg,x(t),H-16,String(t),{class:'tick','text-anchor':'middle'})});
+  txt(svg,x(1)-6,H-3,'◀ fewer infections',{class:'t-mut','font-size':10,'text-anchor':'end'});txt(svg,x(1)+6,H-3,'more infections ▶',{class:'t-mut','font-size':10});
+  txt(svg,(L+R)/2,12,'Relative risk (log scale)',{class:'t-mut','font-size':10.5,'text-anchor':'middle'});txt(svg,W-4,12,'Relative risk (95% CI)',{class:'t-mut','font-size':10.5,'text-anchor':'end'});
+  let y=top;
+  items.forEach(({f,p})=>{const g=el('g',{class:'row',role:'button'},svg);g.style.cursor='pointer';el('rect',{class:'row-hit',x:0,y,width:W,height:RH},g);const cy=y+RH/2;
+    el('line',{x1:x(Math.max(p.lo,d0)),x2:x(Math.min(p.hi,d1)),y1:cy,y2:cy,stroke:'var(--ink)','stroke-width':1.6},g);
+    const m=x(p.est);el('polygon',{points:`${m-6},${cy} ${m},${cy-6} ${m+6},${cy} ${m},${cy+6}`,fill:p.src.startsWith('pool')?'var(--ink)':'var(--surface)',stroke:'var(--ink)','stroke-width':1.5},g);
+    txt(g,4,cy+4,f.title,{'font-size':11.5});txt(g,L-8,cy+4,p.src,{class:'t-mut','font-size':9.5,'text-anchor':'end'});
+    txt(g,W-4,cy+4,`${fr(p.est)} (${fr(p.lo)}–${fr(p.hi)})`,{class:'t-mono','font-size':10.5,'text-anchor':'end'});
+    g.addEventListener('click',()=>onPick(f.id));g.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onPick(f.id)}});
+    bindTip(g,()=>`<b>${f.title}</b><br>${f.expo} vs ${f.refgroup.toLowerCase()}<br>${fr(p.est)} (${fr(p.lo)} to ${fr(p.hi)}), ${p.src}.<br>Select to open.`,box);
+    y+=RH});
+  box.appendChild(svg);
+}
+
+/* ---------- factor panels ---------- */
+function factorPanel(prefix,factors,unit){
+  const chips=$('#'+prefix+'Factors');
+  chips.innerHTML=factors.map((f,i)=>`<button type="button" class="chip" data-id="${f.id}" aria-pressed="${i===0}">${f.title}</button>`).join('');
+  function pick(id,scroll){const f=factors.find(x=>x.id===id);chips.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.id===id));
+    $('#'+prefix+'FTitle').textContent=f.title;$('#'+prefix+'FCmp').textContent=`Relative risk = infection rate with ${f.expo.charAt(0).toLowerCase()+f.expo.slice(1)} ÷ rate with ${f.refgroup.toLowerCase()}. Below 1 means fewer infections with ${(SHORT[f.id]||['the first'])[0]}.`;
+    renderForest('#'+prefix+'Forest',f,unit);
+    let note=f.note;const nr=(DATA.ivi.noteRefs||{})[f.id];if(prefix==='ivi'&&nr)note+=` <sup class="r"><a href="#ref${nr}">[${nr}]</a></sup>`;
+    if(f.id==='bilat')note+=` With no bilateral case in 69,239 sessions, the upper 95% bound for a case in both eyes is ${sig(DATA.ivi.bilat_ub*100,2)}% per session (${oneIn(DATA.ivi.bilat_ub)}).`;
+    if(!f.pooled&&NOPOOL[f.id])note='<b>No pool:</b> '+NOPOOL[f.id]+' '+note;
+    $('#'+prefix+'FNote').innerHTML=note;
+    if(prefix==='ivi'){const ex=$('#iviExtra');
+      if(id==='injector'){ex.innerHTML=`<div class="tablewrap"><table><thead><tr><th>Nurse-delivered series</th><th>Cases / injections</th><th>Rate (95% CI)</th><th>Source</th></tr></thead><tbody>${DATA.ivi.nurse.map(r=>`<tr><td>${r.label}</td><td class="num">${r.cases} / ${r.n.toLocaleString()}</td><td class="num">${pct(r.rate)} (${pct(r.lo)} to ${pct(r.hi)})</td><td class="num"><a href="#ref${r.ref}">[${r.ref}]</a></td></tr>`).join('')}</tbody></table></div>`}else ex.innerHTML=''}
+    if(scroll)document.getElementById(prefix+'FTitle').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  chips.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>pick(c.dataset.id)));
+  pick(factors[0].id);
+  renderOverview('#'+prefix+'Overview',factors,id=>pick(id,true));
+}
+
+/* ---------- cumulative calculator ---------- */
+function renderCum(){
+  const n=+$('#cumN').value,basis=$('#cumBasis').value;$('#cumNval').textContent=n;
+  const I=DATA.ivi,src=basis==='all'?I.pooled:basis==='pfs'?I.pfs_rate:I.vial_rate;
+  const cum=(p,k)=>1-Math.pow(1-p,k);
+  const e=cum(src.est,n),lo=cum(src.lo,n),hi=cum(src.hi,n);
+  $('#cumOut').textContent=pct(e);$('#cumCi').textContent=`95% CI ${pct(lo)} to ${pct(hi)} · ${oneIn(e)} eyes`;
+  $('#cumNote').innerHTML=`Hypothetical per-injection risk: ${pct(src.est)} (${pct(src.lo)} to ${pct(src.hi)}). The observed cumulative risks sit below the constant-risk curve beyond about 10 injections. Danish national data also found a lower per-injection risk in patients with more injections (risk ratio 0.32 to 0.54 against patients with 1 to 3 injections) <sup class="r"><a href="#ref${I.cumRef}">[${I.cumRef}]</a></sup>. A likely explanation is that the risk is not the same for every patient: those predisposed to endophthalmitis tend to have it early in their course, and the patients who remain are at lower risk. The constant-risk curve therefore overstates the cumulative risk for long courses.`;
+  const box=$('#cumBox');box.innerHTML='';
+  const W=620,H=300,L=52,R=600,T=16,B=260,K=150;
+  const ymax=Math.max(cum(I.vial_rate.hi,K),cum(I.pooled.hi,K),cum(I.pfs_rate.hi,K));
+  const st=ymax>0.04?0.01:0.005;const ym=Math.ceil(ymax/st)*st;const yt=[];for(let v=0;v<=ym+1e-9;v+=st)yt.push(v);
+  const X=k=>L+(k/K)*(R-L),Y=v=>B-(v/ym)*(B-T);
+  const svg=el('svg',{class:'chart',viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':'Cumulative risk of endophthalmitis by number of injections'});
+  yt.forEach(v=>{el('line',{x1:L,x2:R,y1:Y(v),y2:Y(v),stroke:'var(--grid)'},svg);txt(svg,L-6,Y(v)+4,(v*100).toFixed(1)+'%',{class:'tick','text-anchor':'end'})});
+  [0,25,50,75,100,125,150].forEach(k=>txt(svg,X(k),B+16,String(k),{class:'tick','text-anchor':'middle'}));
+  txt(svg,(L+R)/2,B+34,'Injections in the eye',{class:'t-mut','text-anchor':'middle','font-size':11});
+  let up='',dn='',ln='';for(let k=0;k<=K;k++){up+=`${X(k)},${Y(cum(src.hi,k))} `;ln+=`${k?'L':'M'}${X(k)},${Y(cum(src.est,k))} `}
+  for(let k=K;k>=0;k--)dn+=`${X(k)},${Y(cum(src.lo,k))} `;
+  el('polygon',{points:up+dn,fill:'var(--band)'},svg);
+  el('path',{d:ln,fill:'none',stroke:'var(--ink)','stroke-width':2},svg);
+  el('line',{x1:X(n),x2:X(n),y1:T,y2:B,stroke:'var(--p2)','stroke-dasharray':'3 3'},svg);
+  el('circle',{cx:X(n),cy:Y(e),r:5,fill:'var(--ink)',stroke:'var(--surface)','stroke-width':2},svg);
+  I.cumobs.forEach((o,j)=>o.pts.forEach(([k,v])=>{if(k<=K){const g=el('g',{class:'row'},svg);el('circle',{cx:X(k),cy:Y(v/100),r:5,fill:'var(--surface)',stroke:j?'var(--p2)':'var(--ink)','stroke-width':1.6},g);
+    bindTip(g,()=>`<b>${o.label}</b> [${o.ref}]<br>Observed cumulative risk ${v}% after ${k} injections.`,box)}}));
+  const lx=L+10;el('circle',{cx:lx,cy:T+6,r:4,fill:'var(--surface)',stroke:'var(--ink)','stroke-width':1.6},svg);txt(svg,lx+8,T+10,`Wills Eye cohort [${I.cumobs[0].ref}]`,{'font-size':10.5,class:'t-mut'});
+  el('circle',{cx:lx,cy:T+22,r:4,fill:'var(--surface)',stroke:'var(--p2)','stroke-width':1.6},svg);txt(svg,lx+8,T+26,`IRIS Registry [${I.cumobs[1].ref}]`,{'font-size':10.5,class:'t-mut'});
+  box.appendChild(svg);
+}
+/* ---------- references ---------- */
+function renderRefs(){
+  $('#refList').innerHTML=DATA.refs.map(r=>{const link=r.pmid?`<a href="https://pubmed.ncbi.nlm.nih.gov/${r.pmid}/" target="_blank" rel="noopener">PMID ${r.pmid}</a>`:'';const d=r.doi?`<a href="https://doi.org/${r.doi}" target="_blank" rel="noopener">doi</a>`:'';
+    return `<li id="ref${r.n}"><span class="n">${r.n}</span><span>${r.cite} ${[link,d].filter(Boolean).join(' · ')}${r.src!=='PubMed'?'<span class="lib">Library</span>':''}</span></li>`}).join('');
+  $('#exclList').textContent=DATA.ivi.excluded.map(e=>refShortKey(e[0])+' ('+e[1].replace(/ \[.*\]/,'')+')').join('; ');
+}
+function refShortKey(k){const r=DATA.refs.find(x=>x.key===k);return r?authYear(r.n)+' ['+r.n+']':k}
+
+/* ---------- boot ---------- */
+const iviState={grp:'all',sort:'n'},catState={grp:'all',sort:'n'};
+function drawIvi(){renderSeries('#iviSeriesBox',DATA.ivi.series,DATA.ivi.pooled,DATA.ivi.pooled_groups,'group',iviState,'injections')}
+function drawCat(){renderSeries('#catSeriesBox',DATA.cat.series,DATA.cat.pooled,DATA.cat.pooled_groups,'ic',catState,'operations')}
+segInit('#iviGrp',[{v:'all',l:'All'},{v:'National, claims or registry',l:'National or registry'},{v:'Multi-centre',l:'Multi-centre'},{v:'Single centre',l:'Single centre'}],iviState,'grp',drawIvi);
+segInit('#iviSort',null,iviState,'sort',drawIvi);
+segInit('#catGrp',[{v:'all',l:'All'},{v:'Routine intracameral',l:'Routine intracameral'},{v:'No routine intracameral',l:'No routine intracameral'},{v:'Mixed or not recorded',l:'Mixed or not recorded'},{v:'recent',l:'From 2010'}],catState,'grp',drawCat);
+segInit('#catSort',null,catState,'sort',drawCat);
+$('#catLegend').innerHTML=['Routine intracameral','Mixed or not recorded','No routine intracameral'].map(g=>`<span><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="${GROUPSHADE[g]}"/></svg>${g}</span>`).join('');
+renderTiles();drawIvi();drawCat();
+
+factorPanel('ivi',DATA.ivi.factors,'injections');factorPanel('cat',DATA.cat.factors,'operations');
+function tileActions(prefix,acts,state,draw){
+  const tiles=[...document.querySelectorAll('#'+prefix+'Tiles .tile')];
+  function mark(){tiles.forEach((t,i)=>t.setAttribute('aria-pressed',acts[i][0]==='grp'&&acts[i][1]===state.grp))}
+  tiles.forEach((t,i)=>{const [kind,val]=acts[i];t.setAttribute('role','button');t.tabIndex=0;
+    t.title=kind==='grp'?'Show these series in the chart below':'Open the comparative studies below';
+    const go=()=>{if(kind==='grp'){state.grp=val;document.querySelectorAll('#'+prefix+'Grp button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===val));draw();mark();
+        document.getElementById(prefix+'SeriesBox').closest('.panel').scrollIntoView({behavior:'smooth',block:'start'})}
+      else{document.querySelector('#'+prefix+'Factors .chip[data-id="'+val+'"]').click();document.getElementById(prefix+'FTitle').scrollIntoView({behavior:'smooth',block:'start'})}};
+    t.addEventListener('click',go);t.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}})});
+  document.querySelectorAll('#'+prefix+'Grp button').forEach(b=>b.addEventListener('click',mark));mark()}
+tileActions('ivi',[['grp','all'],...Object.keys(DATA.ivi.pooled_groups).map(g=>['grp',g]),['factor','pfs'],['factor','pfs']],iviState,drawIvi);
+tileActions('cat',[['grp','Routine intracameral'],['grp','No routine intracameral'],['grp','Mixed or not recorded'],['grp','recent'],['factor','ic'],['grp','all']],catState,drawCat);
+$('#cumN').addEventListener('input',renderCum);$('#cumBasis').addEventListener('change',renderCum);renderCum();
+renderRefs();
+function setProc(p){document.querySelectorAll('[data-proc-sec]').forEach(s=>s.hidden=s.dataset.procSec!==p);
+  document.querySelectorAll('#procSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.proc===p));hideTip()}
+document.querySelectorAll('#procSeg button').forEach(b=>b.addEventListener('click',()=>{setProc(b.dataset.proc);try{history.replaceState(null,'','#'+(b.dataset.proc==='ivi'?'injection':'cataract'))}catch(e){}}));
+if(location.hash==='#cataract')setProc('cat');
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#ref"]');if(a){/* allow default jump */}});
+</script>
